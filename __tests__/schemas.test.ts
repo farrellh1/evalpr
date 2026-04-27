@@ -9,12 +9,12 @@ import {
 describe('PrincipleSchema', () => {
   it('parses a valid principle', () => {
     const result = PrincipleSchema.parse({
-      id: 'P001',
+      id: 'no-default-export',
       description: 'Avoid side effects in pure functions',
       severity: 'warning',
       category: 'correctness'
     })
-    expect(result.id).toBe('P001')
+    expect(result.id).toBe('no-default-export')
     expect(result.severity).toBe('warning')
     expect(result.category).toBe('correctness')
   })
@@ -22,7 +22,7 @@ describe('PrincipleSchema', () => {
   it('rejects an unknown severity', () => {
     expect(() =>
       PrincipleSchema.parse({
-        id: 'P001',
+        id: 'no-default-export',
         description: 'Some principle',
         severity: 'critical',
         category: 'correctness'
@@ -33,7 +33,7 @@ describe('PrincipleSchema', () => {
   it('rejects an unknown category', () => {
     expect(() =>
       PrincipleSchema.parse({
-        id: 'P001',
+        id: 'no-default-export',
         description: 'Some principle',
         severity: 'warning',
         category: 'aesthetics'
@@ -50,7 +50,7 @@ describe('ReviewCommentSchema', () => {
       type: 'bug',
       severity: 'error',
       body: 'This will cause a null dereference',
-      principle_cited: 'P001',
+      principle_cited: 'no-default-export',
       reasoning: 'The value may be undefined when accessed here'
     })
     expect(result.line).toBe(42)
@@ -65,7 +65,7 @@ describe('ReviewCommentSchema', () => {
         type: 'bug',
         severity: 'error',
         body: 'Something wrong',
-        principle_cited: 'P001',
+        principle_cited: 'no-default-export',
         reasoning: 'Because reasons'
       })
     ).toThrow()
@@ -111,16 +111,16 @@ describe('EvalprConfigSchema', () => {
       principles: {
         add: [
           {
-            id: 'P001',
+            id: 'no-default-export',
             description: 'Custom principle',
             severity: 'info',
             category: 'project'
           }
         ],
-        remove: ['BUILTIN_001'],
+        remove: ['performance-async-blocking'],
         override: [
           {
-            id: 'BUILTIN_002',
+            id: 'naming-clarity',
             description: 'Override description',
             severity: 'error',
             category: 'security'
@@ -132,8 +132,8 @@ describe('EvalprConfigSchema', () => {
         ignore_paths: ['dist/**', 'node_modules/**']
       }
     })
-    expect(result.principles?.add?.[0].id).toBe('P001')
-    expect(result.principles?.remove?.[0]).toBe('BUILTIN_001')
+    expect(result.principles?.add?.[0].id).toBe('no-default-export')
+    expect(result.principles?.remove?.[0]).toBe('performance-async-blocking')
     expect(result.review?.confidence_threshold).toBe(70)
     expect(result.review?.ignore_paths).toHaveLength(2)
   })
