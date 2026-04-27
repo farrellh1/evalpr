@@ -39,4 +39,28 @@ describe('defaultPrinciples', () => {
       ])
     )
   })
+
+  it('matches the documented category distribution', () => {
+    const counts = defaultPrinciples.reduce<Record<string, number>>(
+      (acc, p) => ({ ...acc, [p.category]: (acc[p.category] ?? 0) + 1 }),
+      {}
+    )
+    expect(counts).toEqual({
+      correctness: 3,
+      security: 3,
+      readability: 3,
+      maintainability: 3,
+      performance: 2,
+      testing: 2,
+      project: 1
+    })
+  })
+
+  it('all security principles are error severity', () => {
+    const security = defaultPrinciples.filter((p) => p.category === 'security')
+    expect(security.length).toBeGreaterThan(0)
+    for (const p of security) {
+      expect(p.severity).toBe('error')
+    }
+  })
 })
