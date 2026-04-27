@@ -87,4 +87,45 @@ describe('callReviewer', () => {
     ).rejects.toThrow()
     expect(create).toHaveBeenCalledTimes(2)
   })
+
+  it('returns valid output from second attempt when first attempt is malformed', async () => {
+    create
+      .mockResolvedValueOnce({
+        choices: [{ message: { content: 'not json' } }]
+      })
+      .mockResolvedValueOnce({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify([
+                {
+                  file: 'b.ts',
+                  line: 7,
+                  type: 'bug',
+                  severity: 'warning',
+                  body: 'b',
+                  principle_cited: 'p1',
+                  reasoning: 'r'
+                }
+              ])
+            }
+          }
+        ]
+      })
+
+    const result = await callReviewer(fakeClient, 'm', 'd', principles, ctx)
+    expect(result).toHaveLength(1)
+    expect(result[0].file).toBe('b.ts')
+    expect(create).toHaveBeenCalledTimes(2)
+  })
+
+  it('throws a clear error when content is empty', async () => {
+    create.mockResolvedValue({
+      choices: [{ message: { content: '' } }]
+    })
+    await expect(
+      callReviewer(fakeClient, 'm', 'd', principles, ctx)
+    ).rejects.toThrow(/malformed after retry/i)
+    expect(create).toHaveBeenCalledTimes(2)
+  })
 })
