@@ -1,62 +1,162 @@
-/**
- * Unit tests for the action's main functionality, src/main.ts
- *
- * To mock dependencies in ESM, you can create fixtures that export mock
- * functions and objects. For example, the core module is mocked in this test,
- * so that the actual '@actions/core' module is not imported.
- */
-import { jest } from '@jest/globals'
-import * as core from '../__fixtures__/core.js'
-import { wait } from '../__fixtures__/wait.js'
+import { describe, it, expect, jest, beforeEach } from '@jest/globals'
+import { run, type RunDeps } from '../src/main.js'
 
-// Mocks should be declared before the module being tested is imported.
-jest.unstable_mockModule('@actions/core', () => core)
-jest.unstable_mockModule('../src/wait.js', () => ({ wait }))
+function makeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
+  const setFailed = jest.fn()
+  const warning = jest.fn()
+  const setOutput = jest.fn()
+  const info = jest.fn()
+  const debug = jest.fn()
+  const inputs: Record<string, string> = {
+    api_key: 'test-key',
+    reviewer_model: 'm-rev',
+    grader_model: 'm-grade',
+    confidence_threshold: '70',
+    ignore_paths: 'dist/**',
+    max_files: '20',
+    skip_drafts: 'true',
+    config_path: '.evalpr.yml'
+  }
+  const getInput = jest.fn(
+    (name: unknown): string => inputs[name as string] ?? ''
+  )
 
-// The module being tested should be imported dynamically. This ensures that the
-// mocks are used in place of any actual dependencies.
-const { run } = await import('../src/main.js')
+  const createReview = jest.fn().mockResolvedValue({})
+  const createReviewComment = jest.fn().mockResolvedValue({})
+  const get = jest.fn().mockResolvedValue({ data: 'diff content' })
+  const octokit = {
+    rest: { pulls: { get, createReview, createReviewComment } }
+  }
 
-describe('main.ts', () => {
+  const core = {
+    getInput,
+    setFailed,
+    warning,
+    setOutput,
+    info,
+    debug
+  } as unknown as typeof import('@actions/core')
+
+  const github = {
+    getOctokit: jest.fn(() => octokit),
+    context: {
+      repo: { owner: 'o', repo: 'r' },
+      payload: {
+        pull_request: {
+          number: 1,
+          draft: false,
+          user: { type: 'User' },
+          title: 'Test PR',
+          changed_files: 2,
+          head: { sha: 'sha-abc' }
+        }
+      }
+    }
+  } as unknown as typeof import('@actions/github')
+
+  const validReviewerComment = {
+    file: 'src/x.ts',
+    line: 5,
+    type: 'bug' as const,
+    severity: 'warning' as const,
+    body: 'null deref',
+    principle_cited: 'null-undefined-handling',
+    reasoning: 'unsafe access'
+  }
+
+  const validScore = {
+    confidence: 85,
+    specificity: 80,
+    calibration: 80,
+    principle_alignment: 90,
+    final_score: 84,
+    rationale: 'matches'
+  }
+
+  const callReviewer = jest.fn().mockResolvedValue([validReviewerComment])
+  const gradeAll = jest
+    .fn()
+    .mockResolvedValue([
+      { ...validReviewerComment, score: validScore, retained: false }
+    ])
+  const postReview = jest.fn().mockResolvedValue(undefined)
+  const postSkipSummary = jest.fn().mockResolvedValue(undefined)
+  const loadConfig = jest.fn().mockResolvedValue({})
+  const loadContext = jest.fn().mockResolvedValue({})
+  const fetchDiff = jest.fn().mockResolvedValue('diff content')
+  const createClient = jest.fn().mockReturnValue({})
+
+  return {
+    core,
+    github,
+    createClient: createClient as unknown as RunDeps['createClient'],
+    callReviewer: callReviewer as unknown as RunDeps['callReviewer'],
+    gradeAll: gradeAll as unknown as RunDeps['gradeAll'],
+    postReview: postReview as unknown as RunDeps['postReview'],
+    postSkipSummary: postSkipSummary as unknown as RunDeps['postSkipSummary'],
+    loadConfig: loadConfig as unknown as RunDeps['loadConfig'],
+    loadContext: loadContext as unknown as RunDeps['loadContext'],
+    fetchDiff: fetchDiff as unknown as RunDeps['fetchDiff'],
+    ...overrides
+  }
+}
+
+describe('run (integration)', () => {
   beforeEach(() => {
-    // Set the action's inputs as return values from core.getInput().
-    core.getInput.mockImplementation(() => '500')
-
-    // Mock the wait function so that it does not actually wait.
-    wait.mockImplementation(() => Promise.resolve('done!'))
+    jest.clearAllMocks()
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
+  it('happy path: posts retained finding + summary', async () => {
+    const deps = makeDeps()
+    await run(deps)
+    expect(deps.core.setFailed).not.toHaveBeenCalled()
+    expect(deps.postReview).toHaveBeenCalledTimes(1)
+    expect(deps.postSkipSummary).not.toHaveBeenCalled()
   })
 
-  it('Sets the time output', async () => {
-    await run()
-
-    // Verify the time output was set.
-    expect(core.setOutput).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      // Simple regex to match a time string in the format HH:MM:SS.
-      expect.stringMatching(/^\d{2}:\d{2}:\d{2}/)
+  it('skips drafts cleanly', async () => {
+    const deps = makeDeps()
+    ;(deps.github.context.payload.pull_request as { draft: boolean }).draft =
+      true
+    await run(deps)
+    expect(deps.core.setFailed).not.toHaveBeenCalled()
+    expect(deps.fetchDiff).not.toHaveBeenCalled()
+    expect(deps.postSkipSummary).toHaveBeenCalledTimes(1)
+    expect(deps.postSkipSummary).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      'sha-abc',
+      'draft',
+      2
     )
   })
 
-  it('Sets a failed status', async () => {
-    // Clear the getInput mock and return an invalid value.
-    core.getInput.mockClear().mockReturnValueOnce('this is not a number')
+  it('soft-fails on malformed reviewer output (posts summary, exits 0)', async () => {
+    const callReviewer = jest
+      .fn()
+      .mockRejectedValue(
+        new Error('Reviewer output malformed after retry: ...')
+      ) as unknown as RunDeps['callReviewer']
+    const deps = makeDeps({ callReviewer })
+    await run(deps)
+    expect(deps.core.setFailed).not.toHaveBeenCalled()
+    expect(deps.core.warning).toHaveBeenCalled()
+    // Verify the malformed-soft-fallback summary review was posted via
+    // octokit (we look it up via the github mock):
+    const octokit = (deps.github.getOctokit as unknown as jest.Mock).mock
+      .results[0]?.value as {
+      rest: { pulls: { createReview: jest.Mock } }
+    }
+    expect(octokit.rest.pulls.createReview).toHaveBeenCalled()
+    expect(deps.postReview).not.toHaveBeenCalled()
+  })
 
-    // Clear the wait mock and return a rejected promise.
-    wait
-      .mockClear()
-      .mockRejectedValueOnce(new Error('milliseconds is not a number'))
-
-    await run()
-
-    // Verify that the action was marked as failed.
-    expect(core.setFailed).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds is not a number'
+  it('hard-fails when api_key is missing', async () => {
+    const deps = makeDeps()
+    ;(deps.core.getInput as unknown as jest.Mock).mockImplementation(
+      (name: unknown) => (name === 'api_key' ? '' : 'x')
     )
+    await run(deps)
+    expect(deps.core.setFailed).toHaveBeenCalled()
   })
 })
