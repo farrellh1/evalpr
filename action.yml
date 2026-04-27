@@ -1,24 +1,39 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
-
-# Add your action's branding here. This will appear on the GitHub Marketplace.
+name: 'evalpr'
+description: 'Eval-graded AI code review for your PRs'
+author: 'farrellh1'
 branding:
-  icon: heart
-  color: red
-
-# Define your inputs here.
+  icon: 'check-circle'
+  color: 'purple'
 inputs:
-  milliseconds:
-    description: Your input description here
+  api_key:
+    description: 'OpenRouter API key'
     required: true
-    default: '1000'
-
-# Define your outputs here.
+  reviewer_model:
+    description: 'OpenRouter model id for the reviewer'
+    default: 'anthropic/claude-sonnet-4.6'
+  grader_model:
+    description: 'OpenRouter model id for the grader'
+    default: 'anthropic/claude-haiku-4.5'
+  confidence_threshold:
+    description: 'Minimum final_score (0-100) to retain a finding'
+    default: '70'
+  ignore_paths:
+    description: 'Comma-separated glob patterns to ignore'
+    default: 'node_modules/**,*.lock,dist/**,build/**,*.min.js'
+  max_files:
+    description: 'Skip review if PR changes more files than this'
+    default: '20'
+  skip_drafts:
+    description: 'Skip draft PRs'
+    default: 'true'
+  config_path:
+    description: 'Path to .evalpr.yml in the consumer repo'
+    default: '.evalpr.yml'
 outputs:
-  time:
-    description: Your output description here
-
+  retained_count:
+    description: 'Number of high-confidence findings posted'
+  hidden_count:
+    description: 'Number of low-confidence findings hidden by threshold'
 runs:
   using: node24
   main: dist/index.js

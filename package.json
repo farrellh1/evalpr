@@ -1,20 +1,26 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
+  "name": "evalpr",
+  "description": "Eval-graded AI code review for your PRs",
+  "version": "0.1.0-pre",
+  "author": "farrellh1",
   "type": "module",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/farrellh1/evalpr",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/farrellh1/evalpr.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/farrellh1/evalpr/issues"
   },
   "keywords": [
-    "actions"
+    "actions",
+    "ai",
+    "code-review",
+    "llm",
+    "github-action",
+    "openrouter",
+    "anthropic"
   ],
   "exports": {
     ".": "./dist/index.js"
