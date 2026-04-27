@@ -82,7 +82,12 @@ describe('applyIgnorePaths', () => {
   it('handles multiple patterns', () => {
     const patterns = ['node_modules/**', 'dist/**', '*.lock']
     expect(applyIgnorePaths('node_modules/x.js', patterns)).toBe(true)
-    expect(applyIgnorePaths('package-lock.json', patterns)).toBe(true)
+    expect(applyIgnorePaths('Cargo.lock', patterns)).toBe(true)
     expect(applyIgnorePaths('src/x.ts', patterns)).toBe(false)
+  })
+
+  it('does not over-match: *.lock should NOT match clockwork.js', () => {
+    // Guard against an over-eager substring fallback for *.X patterns.
+    expect(applyIgnorePaths('clockwork.js', ['*.lock'])).toBe(false)
   })
 })

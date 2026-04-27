@@ -1,5 +1,4 @@
 import { minimatch } from 'minimatch'
-import { basename } from 'node:path'
 
 export interface PRMeta {
   draft: boolean
@@ -27,16 +26,7 @@ export function shouldSkipPR(
 }
 
 export function applyIgnorePaths(file: string, patterns: string[]): boolean {
-  const base = basename(file)
-  return patterns.some((p) => {
-    if (minimatch(file, p, { matchBase: true, dot: true })) return true
-    // For patterns without slashes (matchBase semantics), also match against
-    // basename using a contains-style glob so that e.g. *.lock matches
-    // package-lock.json (which contains "lock" as a segment).
-    if (!p.includes('/')) {
-      const stem = p.replace(/^\*\./, '')
-      if (stem !== p) return base.includes(stem)
-    }
-    return false
-  })
+  return patterns.some((p) =>
+    minimatch(file, p, { matchBase: true, dot: true })
+  )
 }
