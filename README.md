@@ -146,6 +146,24 @@ scores 81 and 89.
   recall ceiling.
 - Fixtures are author-written. v0.2 will draw from real merged-PR diffs in OSS
   repos to remove author-bias from the eval.
+- Comments post under the default `github-actions[bot]` identity. v0.2 will ship
+  as a proper GitHub App with a branded name + avatar and one-click install —
+  see the [v0.2 roadmap](#whats-next-v02).
+
+## What's next (v0.2)
+
+- **Pass full PR file list to the reviewer** — lifts the recall ceiling above
+  0.88 by enabling untested-critical-path detection on diffs that don't include
+  the relevant test file.
+- **Per-category confidence thresholds** — security at 60, style at 90, instead
+  of one number for everything.
+- **OSS-derived fixtures** — replace the 10 hand-authored fixtures with diffs
+  pulled from real merged PRs to eliminate author-bias.
+- **Real GitHub App** — branded `evalpr[bot]` identity, custom avatar, one-click
+  install via GitHub Marketplace. Backed by a hosted token-minting service so
+  consumers don't manage App credentials per-repo.
+- **Smarter matcher** — collapse multi-instance findings on the same range into
+  one TP so `pr-006`-style cases stop showing as a measurement artifact.
 
 ## License
 
