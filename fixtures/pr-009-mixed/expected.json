@@ -1,0 +1,14 @@
+{
+  "description": "Mixed: get_first_admin_email has a real null deref risk (u.profile or u.profile.email may be None); the single-letter loop variable u is a harmless style nit that should not appear in findings.",
+  "expected_findings": [
+    {
+      "file": "src/admin.py",
+      "line_range": [4, 5],
+      "category": "correctness",
+      "min_severity": "warning",
+      "must_cite_principle": "null-undefined-handling"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 2
+}

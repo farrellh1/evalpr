@@ -1,0 +1,22 @@
+diff --git a/src/db.rs b/src/db.rs
+new file mode 100644
+index 0000000..abcdef1
+--- /dev/null
++++ b/src/db.rs
+@@ -0,0 +1,16 @@
++use sqlx::PgPool;
++
++#[derive(sqlx::FromRow)]
++pub struct User {
++    pub id: String,
++    pub name: String,
++    pub email: String,
++}
++
++pub async fn get_user_by_id(pool: &PgPool, id: &str) -> Result<User, sqlx::Error> {
++    let query = format!("SELECT id, name, email FROM users WHERE id = '{}'", id);
++    let user = sqlx::query_as::<_, User>(&query)
++        .fetch_one(pool)
++        .await?;
++    Ok(user)
++}

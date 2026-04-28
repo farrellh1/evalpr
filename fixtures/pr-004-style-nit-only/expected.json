@@ -1,0 +1,6 @@
+{
+  "description": "Borderline: sum_positive uses single-letter variables (s, n) which are a minor style nit but the function is otherwise correct; a well-tuned reviewer at threshold ≥70 should suppress this.",
+  "expected_findings": [],
+  "expected_clean": true,
+  "max_acceptable_findings": 1
+}

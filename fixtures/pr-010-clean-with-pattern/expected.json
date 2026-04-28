@@ -1,0 +1,6 @@
+{
+  "description": "Clean Result-pattern Rust: parse_config returns Result<Config, ConfigError>, propagates errors with ?, and uses ok_or for Option→Result conversion — fully conforming to the project's stated error-handling convention.",
+  "expected_findings": [],
+  "expected_clean": true,
+  "max_acceptable_findings": 0
+}

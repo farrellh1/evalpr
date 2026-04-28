@@ -1,0 +1,14 @@
+{
+  "description": "Quadratic complexity: findDuplicates uses nested for-loops over a List to detect duplicate IDs via .getId().equals(), giving O(n²) time; a HashSet<String> would reduce this to O(n).",
+  "expected_findings": [
+    {
+      "file": "src/main/java/com/example/Dedup.java",
+      "line_range": [10, 18],
+      "category": "performance",
+      "min_severity": "warning",
+      "must_cite_principle": "obvious-quadratic"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 3
+}

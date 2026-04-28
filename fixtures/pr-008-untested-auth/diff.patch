@@ -1,0 +1,19 @@
+diff --git a/src/auth/middleware.ts b/src/auth/middleware.ts
+new file mode 100644
+index 0000000..f6a7b8c
+--- /dev/null
++++ b/src/auth/middleware.ts
+@@ -0,0 +1,13 @@
++import { Request, Response, NextFunction } from 'express';
++
++interface AuthRequest extends Request {
++  user?: { id: string; role: string };
++}
++
++export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction): void {
++  if (!req.user || req.user.role !== 'admin') {
++    res.status(403).json({ error: 'Forbidden: admin access required' });
++    return;
++  }
++  next();
++}

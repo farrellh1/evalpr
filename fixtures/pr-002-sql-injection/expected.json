@@ -1,0 +1,14 @@
+{
+  "description": "SQL injection: get_user_by_id interpolates a user-supplied id directly into a SQL string via format!, bypassing parameterized query protection.",
+  "expected_findings": [
+    {
+      "file": "src/db.rs",
+      "line_range": [11, 14],
+      "category": "security",
+      "min_severity": "error",
+      "must_cite_principle": "injection-risk"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 3
+}

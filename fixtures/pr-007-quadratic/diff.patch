@@ -1,0 +1,32 @@
+diff --git a/src/main/java/com/example/Dedup.java b/src/main/java/com/example/Dedup.java
+new file mode 100644
+index 0000000..e5f6a7b
+--- /dev/null
++++ b/src/main/java/com/example/Dedup.java
+@@ -0,0 +1,26 @@
++package com.example;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class Dedup {
++
++    public static List<Record> findDuplicates(List<Record> records) {
++        List<Record> duplicates = new ArrayList<>();
++        for (int i = 0; i < records.size(); i++) {
++            for (int j = 0; j < records.size(); j++) {
++                if (i != j && records.get(i).getId().equals(records.get(j).getId())) {
++                    duplicates.add(records.get(i));
++                    break;
++                }
++            }
++        }
++        return duplicates;
++    }
++
++    public static class Record {
++        private String id;
++        public String getId() { return id; }
++        public Record(String id) { this.id = id; }
++    }
++}

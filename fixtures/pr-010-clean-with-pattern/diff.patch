@@ -1,0 +1,32 @@
+diff --git a/src/parser.rs b/src/parser.rs
+new file mode 100644
+index 0000000..b8c9d0e
+--- /dev/null
++++ b/src/parser.rs
+@@ -0,0 +1,26 @@
++use std::collections::HashMap;
++
++#[derive(Debug)]
++pub struct Config {
++    pub values: HashMap<String, String>,
++}
++
++#[derive(Debug)]
++pub enum ConfigError {
++    ExpectedTable,
++    MissingKey(String),
++    ParseError(String),
++}
++
++pub fn parse_config(input: &str) -> Result<Config, ConfigError> {
++    let table: HashMap<String, String> = serde_json::from_str(input)
++        .map_err(|e| ConfigError::ParseError(e.to_string()))?;
++    let values = table
++        .get("config")
++        .ok_or(ConfigError::ExpectedTable)?
++        .split(',')
++        .map(|s| s.split_once('=').ok_or_else(|| ConfigError::MissingKey(s.to_string())))
++        .collect::<Result<Vec<_>, _>>()
++        .map(|pairs| Config { values: pairs.into_iter().map(|(k, v)| (k.to_string(), v.to_string())).collect() })?;
++    Ok(values)
++}

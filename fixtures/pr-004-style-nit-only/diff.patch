@@ -1,0 +1,16 @@
+diff --git a/src/aggregate.py b/src/aggregate.py
+new file mode 100644
+index 0000000..b2c3d4e
+--- /dev/null
++++ b/src/aggregate.py
+@@ -0,0 +1,10 @@
++def sum_positive(numbers):
++    """Return the sum of all positive numbers in the list."""
++    s = 0
++    for n in numbers:
++        if n > 0:
++            s += n
++    return s
++
++def count_items(items):
++    return len(items)

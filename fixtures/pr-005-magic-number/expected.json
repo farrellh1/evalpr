@@ -1,0 +1,14 @@
+{
+  "description": "Magic numbers: fetchWithRetry uses bare literals 5 (max retries) and 1000 (sleep ms) with no named constants, reducing clarity and making changes error-prone.",
+  "expected_findings": [
+    {
+      "file": "src/retry.ts",
+      "line_range": [6, 15],
+      "category": "readability",
+      "min_severity": "info",
+      "must_cite_principle": "naming-clarity"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 2
+}

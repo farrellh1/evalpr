@@ -1,0 +1,14 @@
+{
+  "description": "DRY violation: three near-identical HTTP create handlers (handleUserCreate, handlePostCreate, handleCommentCreate) share identical decode-save-201 structure; should be collapsed into a generic handler.",
+  "expected_findings": [
+    {
+      "file": "handlers/create.go",
+      "line_range": [8, 45],
+      "category": "maintainability",
+      "min_severity": "warning",
+      "must_cite_principle": "dry-with-sense"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 3
+}

@@ -1,0 +1,15 @@
+diff --git a/src/admin.py b/src/admin.py
+new file mode 100644
+index 0000000..a7b8c9d
+--- /dev/null
++++ b/src/admin.py
+@@ -0,0 +1,9 @@
++def get_first_admin_email(users):
++    """Return the lowercased email of the first admin user."""
++    for u in users:
++        if u.role == 'admin':
++            return u.profile.email.lower()
++    return None
++
++def count_admins(users):
++    return sum(1 for u in users if u.role == 'admin')

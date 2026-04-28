@@ -1,0 +1,14 @@
+{
+  "description": "Untested critical path: requireAdmin is a security-critical middleware that gates admin access, but no test file is added in the diff, leaving role-check logic unverified.",
+  "expected_findings": [
+    {
+      "file": "src/auth/middleware.ts",
+      "line_range": [7, 13],
+      "category": "testing",
+      "min_severity": "warning",
+      "must_cite_principle": "untested-critical-path"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 2
+}

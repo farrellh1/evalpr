@@ -1,0 +1,6 @@
+{
+  "description": "Clean refactor: renames getUser to findUserById and extracts a magic string into USER_TABLE const; no bugs, security issues, or smells introduced.",
+  "expected_findings": [],
+  "expected_clean": true,
+  "max_acceptable_findings": 0
+}
