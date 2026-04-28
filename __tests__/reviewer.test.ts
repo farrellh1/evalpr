@@ -1,5 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
-import { callReviewer } from '../src/reviewer.js'
+import { callReviewer, sanitizeJsonEscapes } from '../src/reviewer.js'
 import type { Principle, Context } from '../src/types.js'
 import type { OpenRouterClient } from '../src/openrouter.js'
 
@@ -127,5 +127,37 @@ describe('callReviewer', () => {
       callReviewer(fakeClient, 'm', 'd', principles, ctx)
     ).rejects.toThrow(/malformed after retry/i)
     expect(create).toHaveBeenCalledTimes(2)
+  })
+
+  it('recovers when the model emits invalid backslash escapes (e.g. \\%)', async () => {
+    const raw =
+      '[{"file":"a.ts","line":1,"type":"bug","severity":"warning",' +
+      '"body":"Use \\% wildcard","principle_cited":"p1","reasoning":"r"}]'
+    create.mockResolvedValueOnce({
+      choices: [{ message: { content: raw } }]
+    })
+
+    const result = await callReviewer(fakeClient, 'm', 'd', principles, ctx)
+    expect(result).toHaveLength(1)
+    expect(result[0].body).toContain('\\%')
+    expect(create).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('sanitizeJsonEscapes', () => {
+  it('escapes invalid backslash sequences', () => {
+    expect(sanitizeJsonEscapes('foo\\%bar')).toBe('foo\\\\%bar')
+    expect(sanitizeJsonEscapes('regex \\d+')).toBe('regex \\\\d+')
+  })
+
+  it('preserves valid JSON escapes', () => {
+    expect(sanitizeJsonEscapes('line\\nbreak')).toBe('line\\nbreak')
+    expect(sanitizeJsonEscapes('quote\\"')).toBe('quote\\"')
+    expect(sanitizeJsonEscapes('back\\\\slash')).toBe('back\\\\slash')
+    expect(sanitizeJsonEscapes('unicode\\u0041')).toBe('unicode\\u0041')
+  })
+
+  it('passes through strings with no backslashes', () => {
+    expect(sanitizeJsonEscapes('plain text')).toBe('plain text')
   })
 })

@@ -5,11 +5,21 @@ import { buildReviewerPrompt } from './prompts/reviewer.js'
 
 const MAX_ATTEMPTS = 2
 const FENCE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
+const ESCAPE_OR_CHAR = /\\(u[0-9a-fA-F]{4}|["\\/bfnrtu]|[\s\S])/g
+const VALID_SHORT_ESCAPES = '"\\/bfnrtu'
 
 function stripFences(text: string): string {
   const trimmed = text.trim()
   const m = trimmed.match(FENCE)
   return m ? m[1].trim() : trimmed
+}
+
+export function sanitizeJsonEscapes(text: string): string {
+  return text.replace(ESCAPE_OR_CHAR, (match, group: string) => {
+    if (group.startsWith('u')) return match
+    if (VALID_SHORT_ESCAPES.includes(group)) return match
+    return '\\\\' + group
+  })
 }
 
 function errorMessage(err: unknown): string {
@@ -60,7 +70,7 @@ export async function callReviewer(
         throw new Error('reviewer returned empty content')
       }
       const stripped = stripFences(content)
-      const parsed = JSON.parse(stripped)
+      const parsed = JSON.parse(sanitizeJsonEscapes(stripped))
       return ReviewCommentArraySchema.parse(parsed)
     } catch (err) {
       lastError = err

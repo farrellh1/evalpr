@@ -108191,10 +108191,21 @@ Output rules:
 
 const MAX_ATTEMPTS$1 = 2;
 const FENCE$1 = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/;
+const ESCAPE_OR_CHAR = /\\(u[0-9a-fA-F]{4}|["\\/bfnrtu]|[\s\S])/g;
+const VALID_SHORT_ESCAPES = '"\\/bfnrtu';
 function stripFences$1(text) {
     const trimmed = text.trim();
     const m = trimmed.match(FENCE$1);
     return m ? m[1].trim() : trimmed;
+}
+function sanitizeJsonEscapes(text) {
+    return text.replace(ESCAPE_OR_CHAR, (match, group) => {
+        if (group.startsWith('u'))
+            return match;
+        if (VALID_SHORT_ESCAPES.includes(group))
+            return match;
+        return '\\\\' + group;
+    });
 }
 function errorMessage(err) {
     return err instanceof Error ? err.message : String(err);
@@ -108224,7 +108235,7 @@ async function callReviewer(client, model, diff, principles, ctx) {
                 throw new Error('reviewer returned empty content');
             }
             const stripped = stripFences$1(content);
-            const parsed = JSON.parse(stripped);
+            const parsed = JSON.parse(sanitizeJsonEscapes(stripped));
             return ReviewCommentArraySchema.parse(parsed);
         }
         catch (err) {
