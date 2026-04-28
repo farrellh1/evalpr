@@ -10,6 +10,12 @@ export interface PRRef {
   pull_number: number
 }
 
+export interface SummaryMeta {
+  reviewerModel: string
+  graderModel: string
+  version: string
+}
+
 export async function fetchDiff(octokit: Octokit, ref: PRRef): Promise<string> {
   const res = await octokit.rest.pulls.get({
     ...ref,
@@ -24,7 +30,7 @@ export async function postReview(
   retained: GradedComment[],
   hiddenCount: number,
   commitSha: string,
-  principleIds: string[]
+  meta: SummaryMeta
 ): Promise<void> {
   for (const c of retained) {
     try {
@@ -45,7 +51,7 @@ export async function postReview(
     }
   }
 
-  const summary = renderSummary(retained.length, hiddenCount, principleIds)
+  const summary = renderSummary(retained, hiddenCount, meta)
   await octokit.rest.pulls.createReview({
     ...ref,
     commit_id: commitSha,
@@ -76,19 +82,35 @@ function labelFor(sev: GradedComment['severity']): string {
 }
 
 function renderSummary(
-  retainedCount: number,
+  retained: GradedComment[],
   hiddenCount: number,
-  principleIds: string[]
+  meta: SummaryMeta
 ): string {
-  const principlesLine =
-    principleIds.length > 0
-      ? `\n\nConfigured principles: ${principleIds
-          .map((p) => `\`${p}\``)
+  const counts = new Map<string, number>()
+  for (const c of retained) {
+    counts.set(c.principle_cited, (counts.get(c.principle_cited) ?? 0) + 1)
+  }
+  const triggeredLine =
+    counts.size > 0
+      ? `\n\nTriggered: ${[...counts.entries()]
+          .map(([id, n]) => (n > 1 ? `\`${id}\` ×${n}` : `\`${id}\``))
           .join(', ')}`
       : ''
-  return `**evalpr** posted ${retainedCount} high-confidence finding${
-    retainedCount === 1 ? '' : 's'
+
+  const footer = `\n\n<sub>Reviewed by ${friendlyModel(
+    meta.reviewerModel
+  )} · Graded by ${friendlyModel(meta.graderModel)} · evalpr v${meta.version}</sub>`
+
+  return `**evalpr** posted ${retained.length} high-confidence finding${
+    retained.length === 1 ? '' : 's'
   }. ${hiddenCount} low-confidence finding${
     hiddenCount === 1 ? '' : 's'
-  } hidden.${principlesLine}`
+  } hidden.${triggeredLine}${footer}`
+}
+
+function friendlyModel(id: string): string {
+  const last = id.split('/').pop() ?? id
+  const m = last.match(/^claude-([a-z]+)-([\d.]+)$/)
+  if (m) return `${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}`
+  return last
 }

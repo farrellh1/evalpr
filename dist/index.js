@@ -82843,9 +82843,9 @@ function getUserAgent$1() {
     return "<environment undetectable>";
 }
 
-const VERSION$6 = "9.0.6";
+const VERSION$7 = "9.0.6";
 
-const userAgent = `octokit-endpoint.js/${VERSION$6} ${getUserAgent$1()}`;
+const userAgent = `octokit-endpoint.js/${VERSION$7} ${getUserAgent$1()}`;
 const DEFAULTS = {
   method: "GET",
   baseUrl: "https://api.github.com",
@@ -83184,7 +83184,7 @@ function getUserAgent() {
     return "<environment undetectable>";
 }
 
-const VERSION$5 = "8.4.1";
+const VERSION$6 = "8.4.1";
 
 function isPlainObject$1(value) {
   if (typeof value !== "object" || value === null)
@@ -83527,14 +83527,14 @@ function withDefaults$1(oldEndpoint, newDefaults) {
 
 const request = withDefaults$1(endpoint, {
   headers: {
-    "user-agent": `octokit-request.js/${VERSION$5} ${getUserAgent()}`
+    "user-agent": `octokit-request.js/${VERSION$6} ${getUserAgent()}`
   }
 });
 
 // pkg/dist-src/index.js
 
 // pkg/dist-src/version.js
-var VERSION$4 = "7.1.1";
+var VERSION$5 = "7.1.1";
 
 // pkg/dist-src/error.js
 function _buildMessageForResponseErrors(data) {
@@ -83633,7 +83633,7 @@ function withDefaults(request2, newDefaults) {
 // pkg/dist-src/index.js
 withDefaults(request, {
   headers: {
-    "user-agent": `octokit-graphql.js/${VERSION$4} ${getUserAgent$2()}`
+    "user-agent": `octokit-graphql.js/${VERSION$5} ${getUserAgent$2()}`
   },
   method: "POST",
   url: "/graphql"
@@ -83694,7 +83694,7 @@ const createTokenAuth = function createTokenAuth2(token) {
 // pkg/dist-src/index.js
 
 // pkg/dist-src/version.js
-var VERSION$3 = "5.2.2";
+var VERSION$4 = "5.2.2";
 
 // pkg/dist-src/index.js
 var noop$1 = () => {
@@ -83716,10 +83716,10 @@ function createLogger(logger = {}) {
   }
   return logger;
 }
-var userAgentTrail = `octokit-core.js/${VERSION$3} ${getUserAgent$2()}`;
+var userAgentTrail = `octokit-core.js/${VERSION$4} ${getUserAgent$2()}`;
 var Octokit = class {
   static {
-    this.VERSION = VERSION$3;
+    this.VERSION = VERSION$4;
   }
   static defaults(defaults) {
     const OctokitWithDefaults = class extends this {
@@ -83836,7 +83836,7 @@ var distWeb$1 = /*#__PURE__*/Object.freeze({
 
 var require$$2 = /*@__PURE__*/getAugmentedNamespace(distWeb$1);
 
-const VERSION$2 = "10.4.1";
+const VERSION$3 = "10.4.1";
 
 const Endpoints = {
   actions: {
@@ -85956,7 +85956,7 @@ function restEndpointMethods(octokit) {
     rest: api
   };
 }
-restEndpointMethods.VERSION = VERSION$2;
+restEndpointMethods.VERSION = VERSION$3;
 function legacyRestEndpointMethods(octokit) {
   const api = endpointsToMethods(octokit);
   return {
@@ -85964,7 +85964,7 @@ function legacyRestEndpointMethods(octokit) {
     rest: api
   };
 }
-legacyRestEndpointMethods.VERSION = VERSION$2;
+legacyRestEndpointMethods.VERSION = VERSION$3;
 
 var distSrc = /*#__PURE__*/Object.freeze({
     __proto__: null,
@@ -85975,7 +85975,7 @@ var distSrc = /*#__PURE__*/Object.freeze({
 var require$$3 = /*@__PURE__*/getAugmentedNamespace(distSrc);
 
 // pkg/dist-src/version.js
-var VERSION$1 = "9.2.2";
+var VERSION$2 = "9.2.2";
 
 // pkg/dist-src/normalize-paginated-list-response.js
 function normalizePaginatedListResponse(response) {
@@ -86335,7 +86335,7 @@ function paginateRest(octokit) {
     })
   };
 }
-paginateRest.VERSION = VERSION$1;
+paginateRest.VERSION = VERSION$2;
 
 var distWeb = /*#__PURE__*/Object.freeze({
     __proto__: null,
@@ -86753,7 +86753,7 @@ const safeJSON = (text) => {
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const VERSION = '6.34.0'; // x-release-please-version
+const VERSION$1 = '6.34.0'; // x-release-please-version
 
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 const isRunningInBrowser = () => {
@@ -86785,7 +86785,7 @@ const getPlatformProperties = () => {
     if (detectedPlatform === 'deno') {
         return {
             'X-Stainless-Lang': 'js',
-            'X-Stainless-Package-Version': VERSION,
+            'X-Stainless-Package-Version': VERSION$1,
             'X-Stainless-OS': normalizePlatform(Deno.build.os),
             'X-Stainless-Arch': normalizeArch(Deno.build.arch),
             'X-Stainless-Runtime': 'deno',
@@ -86795,7 +86795,7 @@ const getPlatformProperties = () => {
     if (typeof EdgeRuntime !== 'undefined') {
         return {
             'X-Stainless-Lang': 'js',
-            'X-Stainless-Package-Version': VERSION,
+            'X-Stainless-Package-Version': VERSION$1,
             'X-Stainless-OS': 'Unknown',
             'X-Stainless-Arch': `other:${EdgeRuntime}`,
             'X-Stainless-Runtime': 'edge',
@@ -86806,7 +86806,7 @@ const getPlatformProperties = () => {
     if (detectedPlatform === 'node') {
         return {
             'X-Stainless-Lang': 'js',
-            'X-Stainless-Package-Version': VERSION,
+            'X-Stainless-Package-Version': VERSION$1,
             'X-Stainless-OS': normalizePlatform(globalThis.process.platform ?? 'unknown'),
             'X-Stainless-Arch': normalizeArch(globalThis.process.arch ?? 'unknown'),
             'X-Stainless-Runtime': 'node',
@@ -86817,7 +86817,7 @@ const getPlatformProperties = () => {
     if (browserInfo) {
         return {
             'X-Stainless-Lang': 'js',
-            'X-Stainless-Package-Version': VERSION,
+            'X-Stainless-Package-Version': VERSION$1,
             'X-Stainless-OS': 'Unknown',
             'X-Stainless-Arch': 'unknown',
             'X-Stainless-Runtime': `browser:${browserInfo.browser}`,
@@ -86827,7 +86827,7 @@ const getPlatformProperties = () => {
     // TODO add support for Cloudflare workers, etc.
     return {
         'X-Stainless-Lang': 'js',
-        'X-Stainless-Package-Version': VERSION,
+        'X-Stainless-Package-Version': VERSION$1,
         'X-Stainless-OS': 'Unknown',
         'X-Stainless-Arch': 'unknown',
         'X-Stainless-Runtime': 'unknown',
@@ -93665,7 +93665,7 @@ class OpenAI {
         return stringifyQuery(query);
     }
     getUserAgent() {
-        return `${this.constructor.name}/JS ${VERSION}`;
+        return `${this.constructor.name}/JS ${VERSION$1}`;
     }
     defaultIdempotencyKey() {
         return `stainless-node-retry-${uuid4()}`;
@@ -108073,7 +108073,7 @@ async function fetchDiff(octokit, ref) {
     });
     return res.data;
 }
-async function postReview(octokit, ref, retained, hiddenCount, commitSha, principleIds) {
+async function postReview(octokit, ref, retained, hiddenCount, commitSha, meta) {
     for (const c of retained) {
         try {
             await octokit.rest.pulls.createReviewComment({
@@ -108089,7 +108089,7 @@ async function postReview(octokit, ref, retained, hiddenCount, commitSha, princi
             warning(`Failed to post inline comment on ${c.file}:${c.line}: ${err instanceof Error ? err.message : String(err)}`);
         }
     }
-    const summary = renderSummary(retained.length, hiddenCount, principleIds);
+    const summary = renderSummary(retained, hiddenCount, meta);
     await octokit.rest.pulls.createReview({
         ...ref,
         commit_id: commitSha,
@@ -108116,14 +108116,28 @@ function labelFor(sev) {
             return 'ℹ info';
     }
 }
-function renderSummary(retainedCount, hiddenCount, principleIds) {
-    const principlesLine = principleIds.length > 0
-        ? `\n\nConfigured principles: ${principleIds
-            .map((p) => `\`${p}\``)
+function renderSummary(retained, hiddenCount, meta) {
+    const counts = new Map();
+    for (const c of retained) {
+        counts.set(c.principle_cited, (counts.get(c.principle_cited) ?? 0) + 1);
+    }
+    const triggeredLine = counts.size > 0
+        ? `\n\nTriggered: ${[...counts.entries()]
+            .map(([id, n]) => (n > 1 ? `\`${id}\` ×${n}` : `\`${id}\``))
             .join(', ')}`
         : '';
-    return `**evalpr** posted ${retainedCount} high-confidence finding${retainedCount === 1 ? '' : 's'}. ${hiddenCount} low-confidence finding${hiddenCount === 1 ? '' : 's'} hidden.${principlesLine}`;
+    const footer = `\n\n<sub>Reviewed by ${friendlyModel(meta.reviewerModel)} · Graded by ${friendlyModel(meta.graderModel)} · evalpr v${meta.version}</sub>`;
+    return `**evalpr** posted ${retained.length} high-confidence finding${retained.length === 1 ? '' : 's'}. ${hiddenCount} low-confidence finding${hiddenCount === 1 ? '' : 's'} hidden.${triggeredLine}${footer}`;
 }
+function friendlyModel(id) {
+    const last = id.split('/').pop() ?? id;
+    const m = last.match(/^claude-([a-z]+)-([\d.]+)$/);
+    if (m)
+        return `${m[1][0].toUpperCase()}${m[1].slice(1)} ${m[2]}`;
+    return last;
+}
+
+const VERSION = '0.1.0-pre';
 
 async function postSkipSummary(octokit, ref, commitSha, reason, fileCount) {
     const body = renderSkipBody(reason, fileCount);
@@ -108396,7 +108410,11 @@ async function run(deps = {}) {
         const flagged = filterByThreshold(graded, effectiveThreshold);
         const retained = flagged.filter((c) => c.retained);
         const hidden = flagged.length - retained.length;
-        await d.postReview(octokit, ref, retained, hidden, commitSha, principles.map((p) => p.id));
+        await d.postReview(octokit, ref, retained, hidden, commitSha, {
+            reviewerModel,
+            graderModel,
+            version: VERSION
+        });
         d.core.setOutput('retained_count', retained.length);
         d.core.setOutput('hidden_count', hidden);
     }

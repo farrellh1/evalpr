@@ -6,6 +6,7 @@ import { loadConfig, mergePrinciples } from './config.js'
 import { loadContext } from './context.js'
 import { shouldSkipPR, applyIgnorePaths } from './filters.js'
 import { fetchDiff, postReview } from './github.js'
+import { VERSION } from './version.js'
 import { postSkipSummary } from './github-skip.js'
 import { callReviewer } from './reviewer.js'
 import { gradeAll } from './grader.js'
@@ -18,7 +19,7 @@ import type {
   GradedComment,
   EvalprConfig
 } from './types.js'
-import type { Octokit, PRRef } from './github.js'
+import type { Octokit, PRRef, SummaryMeta } from './github.js'
 import type { SkipReason } from './filters.js'
 
 export interface RunDeps {
@@ -45,7 +46,7 @@ export interface RunDeps {
     retained: GradedComment[],
     hiddenCount: number,
     commitSha: string,
-    principleIds: string[]
+    meta: SummaryMeta
   ) => Promise<void>
   postSkipSummary: (
     octokit: Octokit,
@@ -182,14 +183,11 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
     const retained = flagged.filter((c) => c.retained)
     const hidden = flagged.length - retained.length
 
-    await d.postReview(
-      octokit,
-      ref,
-      retained,
-      hidden,
-      commitSha,
-      principles.map((p) => p.id)
-    )
+    await d.postReview(octokit, ref, retained, hidden, commitSha, {
+      reviewerModel,
+      graderModel,
+      version: VERSION
+    })
 
     d.core.setOutput('retained_count', retained.length)
     d.core.setOutput('hidden_count', hidden)
