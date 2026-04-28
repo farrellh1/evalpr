@@ -147,13 +147,6 @@ scores 81 and 89.
 - Fixtures are author-written. v0.2 will draw from real merged-PR diffs in OSS
   repos to remove author-bias from the eval.
 
-## Development
-
-Architectural decisions, evaluation methodology, and prompt design come from me.
-I pair with Claude Code on implementation. Run the test suite with `npm test`,
-the eval with `npm run eval`, and re-render the README table with
-`npm run eval:render`.
-
 ## License
 
 MIT
