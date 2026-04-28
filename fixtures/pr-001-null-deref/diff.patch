@@ -1,0 +1,24 @@
+diff --git a/src/user.ts b/src/user.ts
+new file mode 100644
+index 0000000..1234567
+--- /dev/null
++++ b/src/user.ts
+@@ -0,0 +1,18 @@
++interface User {
++  id: string;
++  email?: string;
++  profile?: { name: string };
++}
++
++export function greetUser(user: User | undefined): string {
++  const name = user.profile.name;
++  return `Hi, ${name}! Email: ${user.email.toLowerCase()}`;
++}
++
++export function fetchEmail(user: User): string {
++  return user.email.toLowerCase();
++}
++
++export function getUserId(user: User): string {
++  return user.id;
++}

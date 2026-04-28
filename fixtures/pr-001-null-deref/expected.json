@@ -1,0 +1,21 @@
+{
+  "description": "Null deref: greetUser accesses user.profile.name without checking if user or user.profile is defined; user.email accessed unconditionally despite optional type.",
+  "expected_findings": [
+    {
+      "file": "src/user.ts",
+      "line_range": [7, 10],
+      "category": "correctness",
+      "min_severity": "warning",
+      "must_cite_principle": "null-undefined-handling"
+    },
+    {
+      "file": "src/user.ts",
+      "line_range": [12, 14],
+      "category": "correctness",
+      "min_severity": "warning",
+      "must_cite_principle": "null-undefined-handling"
+    }
+  ],
+  "expected_clean": false,
+  "max_acceptable_findings": 4
+}
