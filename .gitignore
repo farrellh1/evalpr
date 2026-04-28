@@ -101,3 +101,6 @@ __tests__/runner/*
 # IDE files
 .idea
 *.code-workspace
+
+# Eval runner output
+scripts/eval-results.json

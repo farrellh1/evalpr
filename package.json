@@ -29,6 +29,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "eval": "tsx scripts/eval.ts",
     "bundle": "npm run format:write && npm run package",
     "ci-test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest",
     "coverage": "npx make-coverage-badge --output-path ./badges/coverage.svg",
