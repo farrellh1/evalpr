@@ -1,0 +1,3 @@
+review:
+  ignore_paths:
+    - dist/**

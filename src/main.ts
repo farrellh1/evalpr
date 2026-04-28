@@ -5,6 +5,7 @@ import { defaultPrinciples } from './default-principles.js'
 import { loadConfig, mergePrinciples } from './config.js'
 import { loadContext } from './context.js'
 import { shouldSkipPR, applyIgnorePaths } from './filters.js'
+import { filterDiffByPaths } from './diff-filter.js'
 import { fetchDiff, postReview } from './github.js'
 import { VERSION } from './version.js'
 import { postSkipSummary } from './github-skip.js'
@@ -145,13 +146,14 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
 
     const client = d.createClient(apiKey)
     const diff = await d.fetchDiff(octokit, ref)
+    const filteredDiff = filterDiffByPaths(diff, ignorePaths)
 
     let reviewerComments: ReviewComment[]
     try {
       reviewerComments = await d.callReviewer(
         client,
         reviewerModel,
-        diff,
+        filteredDiff,
         principles,
         ctx
       )
