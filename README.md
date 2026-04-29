@@ -2,14 +2,8 @@
 
 > Eval-graded AI code review for your PRs.
 
-![status](https://img.shields.io/badge/status-🚧%20in%20development-yellow)
+![status](https://img.shields.io/badge/status-released-brightgreen)
 ![license](https://img.shields.io/github/license/farrellh1/evalpr)
-
-<!-- HERO:START -->
-
-_Hero gif goes here once recorded — see `docs/screenshots/hero.gif`._
-
-<!-- HERO:END -->
 
 Two LLMs. **Sonnet 4.6** reviews the diff, **Haiku 4.5** grades each finding
 0–100, and only high-confidence comments make it onto the PR. Configure the

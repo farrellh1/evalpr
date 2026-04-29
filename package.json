@@ -1,7 +1,7 @@
 {
   "name": "evalpr",
   "description": "Eval-graded AI code review for your PRs",
-  "version": "0.1.0-pre",
+  "version": "0.1.0",
   "author": "farrellh1",
   "type": "module",
   "private": true,
