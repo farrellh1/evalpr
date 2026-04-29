@@ -108191,7 +108191,7 @@ function friendlyModel(id) {
     return last;
 }
 
-const VERSION = '0.1.0-pre';
+const VERSION = '0.1.0';
 
 async function postSkipSummary(octokit, ref, commitSha, reason, fileCount) {
     const body = renderSkipBody(reason, fileCount);
@@ -108229,9 +108229,17 @@ function buildReviewerPrompt(principles, ctx) {
     const ctxBlock = ctxParts.length > 0 ? `\nProject context:\n${ctxParts.join('\n\n')}\n` : '';
     return `You are evalpr, a senior code reviewer. Review the provided pull request diff against the configured principles below. Cite the principle id you are invoking for each finding.
 
+Your default state is SILENCE on cosmetics, but you DO flag clear violations of the configured principles. The bar is "would a thoughtful senior raise this in a real PR review?" — not "find something to say."
+
 Configured principles:
 ${principlesBlock}
 ${ctxBlock}
+How to inspect a diff:
+- Read what was added. Then ask: what is MISSING? New critical-path code (auth checks, role/permission gates, payment or billing logic, session handling) without a corresponding test file in the same diff is itself a finding — cite untested-critical-path. The absence of a test file (no *.test.*, *_test.*, or tests/ path) for a new auth/permission function is the signal.
+- Concrete violations that ARE findings (not nitpicks): hardcoded numeric or string constants used as thresholds, limits, or durations (cite naming-clarity); multiple functions that share an identical structural skeleton differing only in the type they operate on (cite dry-with-sense); nested loops over the same collection where a hash-based pass would do (cite obvious-quadratic); unguarded access on optional/nullable values (cite null-undefined-handling); user input interpolated into SQL/HTML/shell strings (cite injection-risk).
+- Match each issue to the SINGLE best-fitting principle. Do not file the same line or concept under multiple principles. Multiple instances of the same issue inside one function are ONE finding citing the function, not one per occurrence. One issue, one comment.
+- A truly clean diff (a rename, a documentation fix, a typo correction, code that already follows the project's stated conventions) should produce ZERO findings. Do not invent issues to look diligent.
+
 Output rules:
 - Output ONLY a JSON array matching the ReviewComment[] schema.
 - ReviewComment = { file: string, line: number, type: 'bug'|'security'|'style'|'design'|'perf'|'test', severity: 'info'|'suggestion'|'warning'|'error', body: string, principle_cited: string, reasoning: string }
@@ -108239,6 +108247,7 @@ Output rules:
 - 'principle_cited' MUST be one of the configured principle ids above.
 - Be specific: cite the exact line, the exact problem, the exact remedy.
 - Do not nitpick whitespace, formatting, or anything a linter would catch.
+- Do not flag idiomatic patterns explicitly endorsed by project context.
 - If the diff has no real issues, return [].
 - Output the JSON array and nothing else. No markdown fences, no prose.`;
 }
