@@ -9,6 +9,10 @@ Two LLMs. **Sonnet 4.6** reviews the diff, **Haiku 4.5** grades each finding
 0–100, and only high-confidence comments make it onto the PR. Configure the
 engineering principles you actually care about — per repo, via `.evalpr.yml`.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="EvalPR posting a graded review comment on a SQL injection finding" width="640">
+</p>
+
 ## Why
 
 Most AI code reviewers post too much noise. evalpr grades its own output and
