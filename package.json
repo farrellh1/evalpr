@@ -48,7 +48,7 @@
     "@actions/core": "^3.0.1",
     "minimatch": "^10.2.5",
     "openai": "^6.35.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.5",
