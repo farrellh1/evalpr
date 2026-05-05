@@ -106,7 +106,7 @@ Options:
     const fixture = await loadFixture(dir)
     const ctx = fixture.context ? { conventions: fixture.context } : {}
 
-    const reviewerComments = await callReviewer(
+    const { comments: reviewerComments } = await callReviewer(
       client,
       REVIEWER_MODEL,
       fixture.diff,
@@ -115,7 +115,7 @@ Options:
     )
     console.log(`  reviewer: ${reviewerComments.length} findings`)
 
-    const graded = await gradeAll(
+    const { graded } = await gradeAll(
       client,
       GRADER_MODEL,
       reviewerComments,

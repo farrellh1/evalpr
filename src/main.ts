@@ -1,6 +1,6 @@
 import * as actionsCore from '@actions/core'
 import * as actionsGithub from '@actions/github'
-import { createOpenRouterClient } from './openrouter.js'
+import { createOpenRouterClient, computeCost, type Usage } from './openrouter.js'
 import { defaultPrinciples } from './default-principles.js'
 import { loadConfig, mergePrinciples } from './config.js'
 import { loadContext } from './context.js'
@@ -21,6 +21,8 @@ import type {
   EvalprConfig
 } from './types.js'
 import type { Octokit, PRRef, SummaryMeta } from './github.js'
+import type { ReviewerResult } from './reviewer.js'
+import type { GradeAllResult } from './grader.js'
 import type { SkipReason } from './filters.js'
 
 export interface RunDeps {
@@ -33,14 +35,14 @@ export interface RunDeps {
     diff: string,
     principles: Principle[],
     ctx: Context
-  ) => Promise<ReviewComment[]>
+  ) => Promise<ReviewerResult>
   gradeAll: (
     client: OpenRouterClient,
     model: string,
     comments: ReviewComment[],
     principles: Principle[],
     ctx: Context
-  ) => Promise<GradedComment[]>
+  ) => Promise<GradeAllResult>
   postReview: (
     octokit: Octokit,
     ref: PRRef,
@@ -149,14 +151,17 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
     const filteredDiff = filterDiffByPaths(diff, ignorePaths)
 
     let reviewerComments: ReviewComment[]
+    let reviewerUsage: Usage
     try {
-      reviewerComments = await d.callReviewer(
+      const reviewerResult = await d.callReviewer(
         client,
         reviewerModel,
         filteredDiff,
         principles,
         ctx
       )
+      reviewerComments = reviewerResult.comments
+      reviewerUsage = reviewerResult.usage
     } catch (err) {
       d.core.warning(
         `Reviewer failed: ${err instanceof Error ? err.message : String(err)}`
@@ -174,7 +179,7 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
       (c) => !applyIgnorePaths(c.file, ignorePaths)
     )
 
-    const graded = await d.gradeAll(
+    const { graded, usage: graderUsage } = await d.gradeAll(
       client,
       graderModel,
       filteredByPath,
@@ -185,14 +190,20 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
     const retained = flagged.filter((c) => c.retained)
     const hidden = flagged.length - retained.length
 
+    const totalCostUsd =
+      computeCost(reviewerModel, reviewerUsage) +
+      computeCost(graderModel, graderUsage)
+
     await d.postReview(octokit, ref, retained, hidden, commitSha, {
       reviewerModel,
       graderModel,
-      version: VERSION
+      version: VERSION,
+      totalCostUsd
     })
 
     d.core.setOutput('retained_count', retained.length)
     d.core.setOutput('hidden_count', hidden)
+    d.core.setOutput('cost_usd', totalCostUsd.toFixed(4))
   } catch (err) {
     d.core.setFailed(
       `evalpr failed: ${err instanceof Error ? err.message : String(err)}`

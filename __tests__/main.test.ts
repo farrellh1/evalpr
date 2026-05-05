@@ -9,8 +9,8 @@ function makeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
   const debug = jest.fn()
   const inputs: Record<string, string> = {
     api_key: 'test-key',
-    reviewer_model: 'm-rev',
-    grader_model: 'm-grade',
+    reviewer_model: 'anthropic/claude-sonnet-4.6',
+    grader_model: 'anthropic/claude-haiku-4.5',
     confidence_threshold: '70',
     ignore_paths: 'dist/**',
     max_files: '20',
@@ -73,12 +73,18 @@ function makeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
     rationale: 'matches'
   }
 
-  const callReviewer = jest.fn().mockResolvedValue([validReviewerComment])
+  const callReviewer = jest
+    .fn()
+    .mockResolvedValue({
+      comments: [validReviewerComment],
+      usage: { input_tokens: 1000, output_tokens: 200 }
+    })
   const gradeAll = jest
     .fn()
-    .mockResolvedValue([
-      { ...validReviewerComment, score: validScore, retained: false }
-    ])
+    .mockResolvedValue({
+      graded: [{ ...validReviewerComment, score: validScore, retained: false }],
+      usage: { input_tokens: 500, output_tokens: 50 }
+    })
   const postReview = jest.fn().mockResolvedValue(undefined)
   const postSkipSummary = jest.fn().mockResolvedValue(undefined)
   const loadConfig = jest.fn().mockResolvedValue({})

@@ -48,7 +48,8 @@ const make = (file: string, line: number, principle = 'p'): GradedComment => ({
 const meta = {
   reviewerModel: 'anthropic/claude-sonnet-4.6',
   graderModel: 'anthropic/claude-haiku-4.5',
-  version: '0.1.0-pre'
+  version: '0.1.0-pre',
+  totalCostUsd: 0.0042
 }
 
 describe('fetchDiff', () => {

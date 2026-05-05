@@ -14,6 +14,7 @@ export interface SummaryMeta {
   reviewerModel: string
   graderModel: string
   version: string
+  totalCostUsd: number
 }
 
 export async function fetchDiff(octokit: Octokit, ref: PRRef): Promise<string> {
@@ -99,7 +100,7 @@ function renderSummary(
 
   const footer = `\n\n<sub>Reviewed by ${friendlyModel(
     meta.reviewerModel
-  )} · Graded by ${friendlyModel(meta.graderModel)} · evalpr v${meta.version}</sub>`
+  )} · Graded by ${friendlyModel(meta.graderModel)} · cost: $${meta.totalCostUsd.toFixed(4)} · evalpr v${meta.version}</sub>`
 
   return `**evalpr** posted ${retained.length} high-confidence finding${
     retained.length === 1 ? '' : 's'
