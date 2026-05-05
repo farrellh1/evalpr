@@ -1,4 +1,5 @@
 import type { OpenRouterClient } from './openrouter.js'
+import { extractUsage, addUsage, ZERO_USAGE, type Usage } from './openrouter.js'
 import type {
   Principle,
   Context,
@@ -27,14 +28,20 @@ const FAILED_SCORE: Score = {
   rationale: 'grader output malformed; comment hidden'
 }
 
+export interface GradeCommentResult {
+  score: Score
+  usage: Usage
+}
+
 export async function gradeComment(
   client: OpenRouterClient,
   model: string,
   comment: ReviewComment,
   principles: Principle[],
   ctx: Context
-): Promise<Score> {
+): Promise<GradeCommentResult> {
   const systemPrompt = buildGraderPrompt(comment, principles, ctx)
+  let totalUsage: Usage = ZERO_USAGE
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
       const reminder =
@@ -49,16 +56,23 @@ export async function gradeComment(
         ],
         temperature: 0
       })
+      // Capture usage BEFORE any throw — billed regardless of parse success.
+      totalUsage = addUsage(totalUsage, extractUsage(res))
       const content = res.choices[0]?.message?.content ?? ''
       if (!content.trim()) throw new Error('grader returned empty content')
       const stripped = stripFences(content)
       const parsed = JSON.parse(stripped)
-      return ScoreSchema.parse(parsed)
+      return { score: ScoreSchema.parse(parsed), usage: totalUsage }
     } catch {
-      // continue
+      // continue; totalUsage already updated for this attempt if response arrived
     }
   }
-  return FAILED_SCORE
+  return { score: FAILED_SCORE, usage: totalUsage }
+}
+
+export interface GradeAllResult {
+  graded: GradedComment[]
+  usage: Usage
 }
 
 export async function gradeAll(
@@ -67,9 +81,18 @@ export async function gradeAll(
   comments: ReviewComment[],
   principles: Principle[],
   ctx: Context
-): Promise<GradedComment[]> {
-  const scores = await Promise.all(
+): Promise<GradeAllResult> {
+  const results = await Promise.all(
     comments.map((c) => gradeComment(client, model, c, principles, ctx))
   )
-  return comments.map((c, i) => ({ ...c, score: scores[i], retained: false }))
+  const totalUsage = results.reduce(
+    (acc, r) => addUsage(acc, r.usage),
+    ZERO_USAGE
+  )
+  const graded = comments.map((c, i) => ({
+    ...c,
+    score: results[i].score,
+    retained: false
+  }))
+  return { graded, usage: totalUsage }
 }
