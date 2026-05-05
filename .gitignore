@@ -104,3 +104,6 @@ __tests__/runner/*
 
 # Eval runner output
 scripts/eval-results.json
+
+# Git worktrees
+.worktrees/
