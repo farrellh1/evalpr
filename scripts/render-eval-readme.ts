@@ -15,13 +15,14 @@ interface ResultsFile {
   generated_at: string
   reviewer_model: string
   grader_model: string
+  reviewer_cost_usd_total: number
+  grader_cost_usd_total: number
   results: { fixture: string; per_threshold: PerThreshold[] }[]
 }
 
 async function main() {
-  const data: ResultsFile = JSON.parse(
-    await readFile('scripts/eval-results.json', 'utf8')
-  )
+  const path = process.argv[2] || 'scripts/results-haiku.json'
+  const data: ResultsFile = JSON.parse(await readFile(path, 'utf8'))
 
   const agg: Record<number, { tp: number; fp: number; fn: number; n: number }> =
     {}
@@ -35,9 +36,16 @@ async function main() {
     }
   }
 
+  const totalCost = data.reviewer_cost_usd_total + data.grader_cost_usd_total
+  const perPR = totalCost / data.results.length
+
   const lines: string[] = []
   lines.push(
     `_Eval results across ${data.results.length} fixtures, ${data.reviewer_model} → ${data.grader_model}, generated ${data.generated_at.slice(0, 10)}._`
+  )
+  lines.push('')
+  lines.push(
+    `_Total run cost: $${totalCost.toFixed(4)} (reviewer $${data.reviewer_cost_usd_total.toFixed(4)} + grader $${data.grader_cost_usd_total.toFixed(4)}); avg per fixture: $${perPR.toFixed(4)}._`
   )
   lines.push('')
   lines.push('| threshold | precision | recall | F1   | findings/PR |')
