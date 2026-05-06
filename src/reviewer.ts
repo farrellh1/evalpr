@@ -1,4 +1,5 @@
 import type { OpenRouterClient } from './openrouter.js'
+import { extractUsage, addUsage, ZERO_USAGE, type Usage } from './openrouter.js'
 import type { Principle, Context, ReviewComment } from './types.js'
 import { ReviewCommentArraySchema } from './schemas.js'
 import { buildReviewerPrompt } from './prompts/reviewer.js'
@@ -26,12 +27,17 @@ function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
 }
 
+interface CallOnceResult {
+  content: string
+  usage: Usage
+}
+
 async function callOnce(
   client: OpenRouterClient,
   model: string,
   systemPrompt: string,
   userPrompt: string
-): Promise<string> {
+): Promise<CallOnceResult> {
   const res = await client.chat.completions.create({
     model,
     messages: [
@@ -40,7 +46,15 @@ async function callOnce(
     ],
     temperature: 0.2
   })
-  return res.choices[0]?.message?.content ?? ''
+  return {
+    content: res.choices[0]?.message?.content ?? '',
+    usage: extractUsage(res)
+  }
+}
+
+export interface ReviewerResult {
+  comments: ReviewComment[]
+  usage: Usage
 }
 
 export async function callReviewer(
@@ -49,10 +63,11 @@ export async function callReviewer(
   diff: string,
   principles: Principle[],
   ctx: Context
-): Promise<ReviewComment[]> {
+): Promise<ReviewerResult> {
   const systemPrompt = buildReviewerPrompt(principles, ctx)
   const userPrompt = `Pull request diff:\n\n${diff}`
 
+  let totalUsage: Usage = ZERO_USAGE
   let lastError: unknown
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
@@ -60,24 +75,31 @@ export async function callReviewer(
         attempt === 0
           ? ''
           : '\n\nIMPORTANT: Output ONLY a valid JSON array. No markdown, no prose.'
-      const content = await callOnce(
+      const { content, usage } = await callOnce(
         client,
         model,
         systemPrompt + reminder,
         userPrompt
       )
+      totalUsage = addUsage(totalUsage, usage)
       if (!content.trim()) {
         throw new Error('reviewer returned empty content')
       }
       const stripped = stripFences(content)
       const parsed = JSON.parse(sanitizeJsonEscapes(stripped))
-      return ReviewCommentArraySchema.parse(parsed)
+      return {
+        comments: ReviewCommentArraySchema.parse(parsed),
+        usage: totalUsage
+      }
     } catch (err) {
       lastError = err
     }
   }
-  throw new Error(
-    `Reviewer output malformed after retry: ${errorMessage(lastError)}`,
-    { cause: lastError }
+  throw Object.assign(
+    new Error(
+      `Reviewer output malformed after retry: ${errorMessage(lastError)}`,
+      { cause: lastError }
+    ),
+    { usage: totalUsage }
   )
 }

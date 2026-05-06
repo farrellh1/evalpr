@@ -29,7 +29,11 @@
     "node": ">=24.0.0"
   },
   "scripts": {
-    "eval": "tsx scripts/eval.ts",
+    "eval:review": "tsx scripts/eval-review.ts",
+    "eval:grade": "tsx scripts/eval-grade.ts",
+    "eval:compare": "tsx scripts/eval-compare.ts",
+    "eval:sweep": "npm run eval:review && npm run eval:grade -- --grader haiku && npm run eval:grade -- --grader sonnet && npm run eval:grade -- --grader opus && npm run eval:compare",
+    "eval": "npm run eval:review && npm run eval:grade -- --grader haiku",
     "eval:render": "tsx scripts/render-eval-readme.ts",
     "bundle": "npm run format:write && npm run package",
     "ci-test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 npx jest",
