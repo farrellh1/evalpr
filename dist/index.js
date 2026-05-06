@@ -94136,7 +94136,7 @@ OpenAI.Skills = Skills;
 OpenAI.Videos = Videos;
 
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-function createOpenRouterClient(apiKey) {
+function createOpenRouterClient(apiKey, referer = 'https://github.com/farrellh1/evalpr', title = 'evalpr') {
     if (!apiKey?.trim()) {
         throw new Error('OpenRouter api key is required');
     }
@@ -94145,8 +94145,8 @@ function createOpenRouterClient(apiKey) {
         baseURL: OPENROUTER_BASE_URL,
         defaultHeaders: {
             // Required by OpenRouter for attribution; do not remove.
-            'HTTP-Referer': 'https://github.com/farrellh1/evalpr',
-            'X-Title': 'evalpr'
+            'HTTP-Referer': referer,
+            'X-Title': title
         }
     });
 }
@@ -108463,7 +108463,7 @@ async function run(deps = {}) {
                 .filter(Boolean),
             ...(cfg.review?.ignore_paths ?? [])
         ];
-        const client = d.createClient(apiKey);
+        const client = d.createClient(apiKey, `${d.github.context.serverUrl}/${ref.owner}/${ref.repo}`);
         const diff = await d.fetchDiff(octokit, ref);
         const filteredDiff = filterDiffByPaths(diff, ignorePaths);
         let reviewerComments;
