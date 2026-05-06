@@ -2,7 +2,11 @@ import OpenAI from 'openai'
 
 export const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1'
 
-export function createOpenRouterClient(apiKey: string): OpenAI {
+export function createOpenRouterClient(
+  apiKey: string,
+  referer = 'https://github.com/farrellh1/evalpr',
+  title = 'evalpr'
+): OpenAI {
   if (!apiKey?.trim()) {
     throw new Error('OpenRouter api key is required')
   }
@@ -11,8 +15,8 @@ export function createOpenRouterClient(apiKey: string): OpenAI {
     baseURL: OPENROUTER_BASE_URL,
     defaultHeaders: {
       // Required by OpenRouter for attribution; do not remove.
-      'HTTP-Referer': 'https://github.com/farrellh1/evalpr',
-      'X-Title': 'evalpr'
+      'HTTP-Referer': referer,
+      'X-Title': title
     }
   })
 }

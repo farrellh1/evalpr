@@ -48,6 +48,7 @@
     "@actions/core": "^3.0.1",
     "minimatch": "^10.2.5",
     "openai": "^6.35.0",
+    "yaml": "^2.8.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {

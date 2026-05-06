@@ -26,7 +26,11 @@ import type { SkipReason } from './filters.js'
 export interface RunDeps {
   core: typeof actionsCore
   github: typeof actionsGithub
-  createClient: (apiKey: string) => OpenRouterClient
+  createClient: (
+    apiKey: string,
+    referer?: string,
+    title?: string
+  ) => OpenRouterClient
   callReviewer: (
     client: OpenRouterClient,
     model: string,
@@ -144,7 +148,10 @@ export async function run(deps: Partial<RunDeps> = {}): Promise<void> {
       ...(cfg.review?.ignore_paths ?? [])
     ]
 
-    const client = d.createClient(apiKey)
+    const client = d.createClient(
+      apiKey,
+      `${d.github.context.serverUrl}/${ref.owner}/${ref.repo}`
+    )
     const diff = await d.fetchDiff(octokit, ref)
     const filteredDiff = filterDiffByPaths(diff, ignorePaths)
 
