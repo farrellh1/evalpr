@@ -69,7 +69,7 @@ number implies. The `pr-008` untested-auth fixture is a structural ceiling for
 v0.1 (the reviewer only sees the diff, not the repo file list) — fix queued for
 v0.2.
 
-## Install (preview — not yet released)
+## Install
 
 ```yaml
 # .github/workflows/evalpr.yml
