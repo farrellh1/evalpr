@@ -73,18 +73,14 @@ function makeDeps(overrides: Partial<RunDeps> = {}): RunDeps {
     rationale: 'matches'
   }
 
-  const callReviewer = jest
-    .fn()
-    .mockResolvedValue({
-      comments: [validReviewerComment],
-      usage: { input_tokens: 1000, output_tokens: 200 }
-    })
-  const gradeAll = jest
-    .fn()
-    .mockResolvedValue({
-      graded: [{ ...validReviewerComment, score: validScore, retained: false }],
-      usage: { input_tokens: 500, output_tokens: 50 }
-    })
+  const callReviewer = jest.fn().mockResolvedValue({
+    comments: [validReviewerComment],
+    usage: { input_tokens: 1000, output_tokens: 200 }
+  })
+  const gradeAll = jest.fn().mockResolvedValue({
+    graded: [{ ...validReviewerComment, score: validScore, retained: false }],
+    usage: { input_tokens: 500, output_tokens: 50 }
+  })
   const postReview = jest.fn().mockResolvedValue(undefined)
   const postSkipSummary = jest.fn().mockResolvedValue(undefined)
   const loadConfig = jest.fn().mockResolvedValue({})

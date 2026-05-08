@@ -53,7 +53,13 @@ describe('reviewer cache I/O', () => {
     await mkdir(join(dir, '.cache'), { recursive: true })
     await writeFile(
       join(dir, '.cache', 'reviewer.json'),
-      JSON.stringify({ cache_key: 'old', comments: [], usage: {}, generated_at: 'x', reviewer_model: 'm' })
+      JSON.stringify({
+        cache_key: 'old',
+        comments: [],
+        usage: {},
+        generated_at: 'x',
+        reviewer_model: 'm'
+      })
     )
     const result = await loadReviewerCache(dir, 'new')
     expect(result).toBeNull()

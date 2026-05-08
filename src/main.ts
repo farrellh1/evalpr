@@ -1,6 +1,10 @@
 import * as actionsCore from '@actions/core'
 import * as actionsGithub from '@actions/github'
-import { createOpenRouterClient, computeCost, type Usage } from './openrouter.js'
+import {
+  createOpenRouterClient,
+  computeCost,
+  type Usage
+} from './openrouter.js'
 import { defaultPrinciples } from './default-principles.js'
 import { loadConfig, mergePrinciples } from './config.js'
 import { loadContext } from './context.js'

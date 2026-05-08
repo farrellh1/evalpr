@@ -29,7 +29,11 @@ interface FixtureResult {
   per_threshold: PerThreshold[]
   cost: {
     grader: { input_tokens: number; output_tokens: number; cost_usd: number }
-    reviewer_cached: { input_tokens: number; output_tokens: number; cost_usd: number }
+    reviewer_cached: {
+      input_tokens: number
+      output_tokens: number
+      cost_usd: number
+    }
   }
 }
 
@@ -103,11 +107,14 @@ function aggregate(results: FixtureResult[]): PerThreshold[] {
 
 async function main() {
   const args = process.argv.slice(2)
-  const inputs = args.length > 0 ? args : [
-    'scripts/results-haiku.json',
-    'scripts/results-sonnet.json',
-    'scripts/results-opus.json'
-  ]
+  const inputs =
+    args.length > 0
+      ? args
+      : [
+          'scripts/results-haiku.json',
+          'scripts/results-sonnet.json',
+          'scripts/results-opus.json'
+        ]
 
   const files: { name: string; data: ResultsFile }[] = []
   for (const path of inputs) {
@@ -116,7 +123,9 @@ async function main() {
     files.push({ name, data })
   }
 
-  console.log(`Loaded ${files.length} grader files: ${files.map((f) => f.name).join(', ')}`)
+  console.log(
+    `Loaded ${files.length} grader files: ${files.map((f) => f.name).join(', ')}`
+  )
 
   // Build comment_id → score map per grader
   const scoresByGrader: Record<string, Map<string, number>> = {}
@@ -131,14 +140,15 @@ async function main() {
   }
 
   // Comment IDs present in ALL graders (intersection)
-  const allIds = files.length === 0
-    ? new Set<string>()
-    : files
-        .map(({ name }) => new Set(scoresByGrader[name].keys()))
-        .reduce(
-          (acc, s) => new Set([...acc].filter((x) => s.has(x))),
-          new Set(scoresByGrader[files[0].name].keys())
-        )
+  const allIds =
+    files.length === 0
+      ? new Set<string>()
+      : files
+          .map(({ name }) => new Set(scoresByGrader[name].keys()))
+          .reduce(
+            (acc, s) => new Set([...acc].filter((x) => s.has(x))),
+            new Set(scoresByGrader[files[0].name].keys())
+          )
 
   // Spearman matrix
   const matrix: { a: string; b: string; rho: number; n: number }[] = []
@@ -217,7 +227,9 @@ async function main() {
 
   // Console summary
   console.log(`\n=== Cost vs Quality (threshold 70) ===`)
-  console.log(`Reviewer (cached, one-shot per PR): $${output.reviewer_cost_usd.toFixed(4)}`)
+  console.log(
+    `Reviewer (cached, one-shot per PR): $${output.reviewer_cost_usd.toFixed(4)}`
+  )
   console.log(`\ngrader  | grader cost | F1 @70 | retained/PR`)
   for (const g of output.graders) {
     const at70 = g.aggregate_per_threshold.find((t) => t.threshold === 70)

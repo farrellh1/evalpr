@@ -21,10 +21,23 @@ describe('callReviewer', () => {
 
   it('parses a valid JSON array response', async () => {
     create.mockResolvedValueOnce({
-      choices: [{ message: { content: JSON.stringify([{
-        file: 'a.ts', line: 1, type: 'bug', severity: 'warning',
-        body: 'b', principle_cited: 'p1', reasoning: 'r'
-      }]) } }],
+      choices: [
+        {
+          message: {
+            content: JSON.stringify([
+              {
+                file: 'a.ts',
+                line: 1,
+                type: 'bug',
+                severity: 'warning',
+                body: 'b',
+                principle_cited: 'p1',
+                reasoning: 'r'
+              }
+            ])
+          }
+        }
+      ],
       usage: { prompt_tokens: 100, completion_tokens: 20 }
     })
 
@@ -86,10 +99,23 @@ describe('callReviewer', () => {
         usage: { prompt_tokens: 50, completion_tokens: 5 }
       })
       .mockResolvedValueOnce({
-        choices: [{ message: { content: JSON.stringify([{
-          file: 'b.ts', line: 7, type: 'bug', severity: 'warning',
-          body: 'b', principle_cited: 'p1', reasoning: 'r'
-        }]) } }],
+        choices: [
+          {
+            message: {
+              content: JSON.stringify([
+                {
+                  file: 'b.ts',
+                  line: 7,
+                  type: 'bug',
+                  severity: 'warning',
+                  body: 'b',
+                  principle_cited: 'p1',
+                  reasoning: 'r'
+                }
+              ])
+            }
+          }
+        ],
         usage: { prompt_tokens: 60, completion_tokens: 8 }
       })
 

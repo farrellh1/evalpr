@@ -12,10 +12,7 @@ import { gradeAll } from '../src/grader.js'
 import { filterByThreshold } from '../src/filter.js'
 import { loadFixture } from '../src/eval/fixture.js'
 import { matchAgainstExpected } from '../src/eval/match.js'
-import {
-  computeCacheKey,
-  loadReviewerCache
-} from '../src/eval/cache.js'
+import { computeCacheKey, loadReviewerCache } from '../src/eval/cache.js'
 import { buildReviewerPrompt } from '../src/prompts/reviewer.js'
 import type { GradedComment, Score } from '../src/types.js'
 
@@ -60,7 +57,11 @@ interface FixtureResult {
   per_threshold: PerThreshold[]
   cost: {
     grader: { input_tokens: number; output_tokens: number; cost_usd: number }
-    reviewer_cached: { input_tokens: number; output_tokens: number; cost_usd: number }
+    reviewer_cached: {
+      input_tokens: number
+      output_tokens: number
+      cost_usd: number
+    }
   }
 }
 

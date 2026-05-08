@@ -21,11 +21,12 @@ export type OpenRouterClient = OpenAI
 
 // USD per million tokens. List price (Anthropic). OpenRouter charges ~5% over.
 // Source: anthropic.com/pricing as of 2026-05-05.
-export const MODEL_PRICING: Record<string, { input: number; output: number }> = {
-  'anthropic/claude-sonnet-4.6': { input: 3, output: 15 },
-  'anthropic/claude-haiku-4.5': { input: 1, output: 5 },
-  'anthropic/claude-opus-4.7': { input: 15, output: 75 }
-}
+export const MODEL_PRICING: Record<string, { input: number; output: number }> =
+  {
+    'anthropic/claude-sonnet-4.6': { input: 3, output: 15 },
+    'anthropic/claude-haiku-4.5': { input: 1, output: 5 },
+    'anthropic/claude-opus-4.7': { input: 15, output: 75 }
+  }
 
 export interface Usage {
   input_tokens: number
