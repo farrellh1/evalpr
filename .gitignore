@@ -102,8 +102,8 @@ __tests__/runner/*
 .idea
 *.code-workspace
 
-# Eval runner output
-scripts/eval-results.json
+# Eval runner output (scripts/ only tracks .ts source)
+scripts/*.json
 
 # Git worktrees
 .worktrees/
