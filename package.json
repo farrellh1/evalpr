@@ -47,7 +47,7 @@
   "dependencies": {
     "@actions/core": "^3.0.1",
     "minimatch": "^10.2.5",
-    "openai": "^6.35.0",
+    "openai": "^6.38.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
